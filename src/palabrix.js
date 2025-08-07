@@ -72,10 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gridSizeSelectMobile: document.getElementById('grid-size-select-mobile'),
         resetProgressBtn: document.getElementById('reset-progress-btn'),
         resetProgressBtnMobile: document.getElementById('reset-progress-btn-mobile'),
-        modalStatsPlayed: document.getElementById('modal-stats-played'),
-        modalStatsCompleted: document.getElementById('modal-stats-completed'),
-        modalStatsBestTime: document.getElementById('modal-stats-best-time'),
-        modalStatsAvgTime: document.getElementById('modal-stats-avg-time'),
         copyFeedback: document.getElementById('copy-feedback'),
         shareTwitter: document.getElementById('share-twitter'),
         shareCopy: document.getElementById('share-copy'),
@@ -137,6 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             gamesCompleted: 0,
             totalCompletionTime: 0,
             bestTimes: {}, // Stores best time per puzzleDayIdentifier-gridSize
+            completedBySize: {}, // Stores completed games count per puzzleDayIdentifier-gridSize
+            timesBySize: {}, // Stores all individual times per puzzleDayIdentifier-gridSize
             lastPlayedDay: 0,
             gameState: {} // Stores progress for the current day
         };
@@ -146,6 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // FIX: Ensure gameState is an object if it's missing from old saves
         if (!stats.gameState) {
             stats.gameState = {};
+        }
+        
+        // FIX: Ensure completedBySize is an object if it's missing from old saves
+        if (!stats.completedBySize) {
+            stats.completedBySize = {};
+        }
+        
+        // FIX: Ensure timesBySize is an object if it's missing from old saves
+        if (!stats.timesBySize) {
+            stats.timesBySize = {};
         }
     }
 
@@ -165,13 +173,104 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderStats() {
-        elements.modalStatsPlayed.textContent = stats.gamesPlayed;
-        elements.modalStatsCompleted.textContent = stats.gamesCompleted;
-        const bestTimeKey = `${puzzleDayIdentifier}-${gridSize}`;
-        const bestTimeForToday = stats.bestTimes[bestTimeKey] || null;
-        elements.modalStatsBestTime.textContent = formatTime(bestTimeForToday);
-        const avgTime = stats.gamesCompleted > 0 ? Math.round(stats.totalCompletionTime / stats.gamesCompleted) : null;
-        elements.modalStatsAvgTime.textContent = formatTime(avgTime);
+        // Obtener estadísticas por tamaño para el día actual
+        const gridSizes = [16, 20, 24];
+        const statsBySize = {};
+        
+        gridSizes.forEach(size => {
+            const bestTimeKey = `${puzzleDayIdentifier}-${size}`;
+            const completedKey = `${puzzleDayIdentifier}-${size}`;
+            const bestTimeForToday = stats.bestTimes[bestTimeKey] || null;
+            
+            // Contar partidas completadas para este tamaño
+            let completedForSize = 0;
+            let totalTimeForSize = 0;
+            
+            // Usar la nueva estructura completedBySize si existe
+            if (stats.completedBySize && stats.completedBySize[completedKey]) {
+                completedForSize = stats.completedBySize[completedKey];
+            } else {
+                // Fallback: contar en bestTimes (cada entrada representa una partida completada)
+                for (const key in stats.bestTimes) {
+                    if (key.startsWith(`${puzzleDayIdentifier}-${size}`)) {
+                        completedForSize++;
+                        totalTimeForSize += stats.bestTimes[key];
+                    }
+                }
+            }
+            
+            // Calcular tiempo total acumulado
+            if (stats.timesBySize && stats.timesBySize[completedKey]) {
+                // Usar los tiempos individuales almacenados para un cálculo preciso
+                totalTimeForSize = stats.timesBySize[completedKey].reduce((sum, time) => sum + time, 0);
+            } else if (stats.completedBySize && stats.completedBySize[completedKey]) {
+                // Fallback: si no tenemos tiempos individuales, usar aproximación
+                if (completedForSize === 1) {
+                    totalTimeForSize = bestTimeForToday || 0;
+                } else if (completedForSize > 1) {
+                    // Para múltiples partidas, usamos una aproximación más conservadora
+                    // Asumimos que el tiempo promedio es 1.2 veces el mejor tiempo
+                    totalTimeForSize = bestTimeForToday ? Math.round(bestTimeForToday * completedForSize * 1.2) : 0;
+                } else {
+                    totalTimeForSize = 0;
+                }
+            } else {
+                // Usar el cálculo anterior basado en bestTimes
+                for (const key in stats.bestTimes) {
+                    if (key.startsWith(`${puzzleDayIdentifier}-${size}`)) {
+                        totalTimeForSize += stats.bestTimes[key];
+                    }
+                }
+            }
+            
+            statsBySize[size] = {
+                completed: completedForSize,
+                bestTime: bestTimeForToday,
+                totalTime: totalTimeForSize
+            };
+        });
+        
+        // Actualizar el HTML del modal con las estadísticas por tamaño
+        const statsContainer = document.querySelector('.modal-stats-container');
+        if (statsContainer) {
+            statsContainer.innerHTML = '';
+            
+            gridSizes.forEach(size => {
+                const sizeStats = statsBySize[size];
+                const sizeSection = document.createElement('div');
+                sizeSection.className = 'mb-4 p-3 bg-slate-700 rounded-lg';
+                
+                const sizeTitle = document.createElement('h4');
+                sizeTitle.className = 'text-lg font-bold text-amber-300 mb-2';
+                sizeTitle.textContent = `Tamaño (${size}x${size})`;
+                
+                const statsList = document.createElement('div');
+                statsList.className = 'space-y-1 text-sm';
+                
+                // Partidas completadas
+                const completedItem = document.createElement('div');
+                completedItem.className = 'flex justify-between';
+                completedItem.innerHTML = `<span>Partidas completadas:</span> <span class="font-mono font-bold">${sizeStats.completed}</span>`;
+                
+                // Mejor tiempo (hoy)
+                const bestTimeItem = document.createElement('div');
+                bestTimeItem.className = 'flex justify-between';
+                bestTimeItem.innerHTML = `<span>Mejor tiempo (hoy):</span> <span class="font-mono font-bold">${formatTime(sizeStats.bestTime)}</span>`;
+                
+                // Tiempo acumulado
+                const totalTimeItem = document.createElement('div');
+                totalTimeItem.className = 'flex justify-between';
+                totalTimeItem.innerHTML = `<span>Tiempo acumulado:</span> <span class="font-mono font-bold">${formatTime(sizeStats.totalTime)}</span>`;
+                
+                statsList.appendChild(completedItem);
+                statsList.appendChild(bestTimeItem);
+                statsList.appendChild(totalTimeItem);
+                
+                sizeSection.appendChild(sizeTitle);
+                sizeSection.appendChild(statsList);
+                statsContainer.appendChild(sizeSection);
+            });
+        }
     }
 
     // --- GAME LOGIC ---
@@ -587,6 +686,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentBest || finalTime < currentBest) {
             stats.bestTimes[bestTimeKey] = finalTime;
         }
+        
+        // Almacenar también el número de partidas completadas por tamaño
+        if (!stats.completedBySize) {
+            stats.completedBySize = {};
+        }
+        const completedKey = `${puzzleDayIdentifier}-${gridSize}`;
+        if (!stats.completedBySize[completedKey]) {
+            stats.completedBySize[completedKey] = 0;
+        }
+        stats.completedBySize[completedKey]++;
+        
+        // Almacenar todos los tiempos individuales para cálculo preciso
+        if (!stats.timesBySize) {
+            stats.timesBySize = {};
+        }
+        const timesKey = `${puzzleDayIdentifier}-${gridSize}`;
+        if (!stats.timesBySize[timesKey]) {
+            stats.timesBySize[timesKey] = [];
+        }
+        stats.timesBySize[timesKey].push(finalTime);
+        
         saveStats();
         
         elements.messageArea.textContent = '¡Has encontrado todas las palabras!';
@@ -658,7 +778,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-
+        if(stats.completedBySize) {
+            for (const key in stats.completedBySize) {
+                if (key.startsWith(`${dayId}-`)) {
+                    delete stats.completedBySize[key];
+                    progressFound = true;
+                }
+            }
+        }
+        if(stats.timesBySize) {
+            for (const key in stats.timesBySize) {
+                if (key.startsWith(`${dayId}-`)) {
+                    delete stats.timesBySize[key];
+                    progressFound = true;
+                }
+            }
+        }
 
         if (progressFound) {
             saveStats();
