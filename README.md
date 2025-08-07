@@ -3,9 +3,13 @@
 [![Tests](https://github.com/anieto2k/palabrix/actions/workflows/test.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/test.yml)
 [![E2E Tests](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml)
 
+> 🎮 **Sopa de letras diaria en JavaScript vanilla** - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales.
+
 **Palabrix** es una aplicación web moderna de sopa de letras diaria desarrollada en JavaScript vanilla. Cada día presenta un nuevo puzzle temático con palabras ocultas en diferentes direcciones (horizontal, vertical y diagonal).
 
-## ✨ Características
+🌐 **Demo en vivo**: [palabrix.anieto2k.com](https://palabrix.anieto2k.com)
+
+## ✨ Características Principales
 
 - 🎮 **Puzzle Diario**: Nuevo puzzle cada día a las 9:00 AM
 - 🎯 **Múltiples Tamaños**: Grids de 16x16, 20x20 y 24x24
@@ -26,39 +30,28 @@
 - Node.js (versión 16 o superior)
 - npm o yarn
 
-### Instalación
+### Instalación Rápida
 
-1. **Clona el repositorio**
-   ```bash
-   git clone https://github.com/anieto2k/palabrix.git
-   cd palabrix
-   ```
+```bash
+# Clona el repositorio
+git clone https://github.com/anieto2k/palabrix.git
+cd palabrix
 
-2. **Instala las dependencias**
-   ```bash
-   npm install
-   ```
+# Instala las dependencias
+npm install
 
-3. **Ejecuta en modo desarrollo**
-   ```bash
-   npm run dev
-   ```
+# Ejecuta en modo desarrollo
+npm run dev
+```
 
-4. **Abre tu navegador**
-   - Ve a `http://localhost:5173`
-   - ¡Disfruta del juego!
+Abre tu navegador en `http://localhost:5173` y ¡disfruta del juego!
 
 ### Scripts Disponibles
 
 ```bash
-# Desarrollo
 npm run dev          # Inicia el servidor de desarrollo
-npm run preview      # Vista previa de la build de producción
-
-# Build
 npm run build        # Construye para producción
-
-# Testing
+npm run preview      # Vista previa de la build de producción
 npm run test         # Ejecuta tests unitarios con Vitest
 npm run e2e          # Ejecuta tests end-to-end con Playwright
 ```
@@ -89,15 +82,14 @@ palabrix/
 │   ├── index.html         # Página principal
 │   ├── main.js           # Punto de entrada
 │   ├── palabrix.js       # Lógica principal del juego
-│   ├── puzzle.js         # Datos de puzzles
+│   ├── puzzle.js         # Datos de puzzles (50+ temas)
 │   ├── confetti.js       # Efectos de confeti
 │   ├── palabrix.css      # Estilos principales
 │   └── *.spec.js         # Tests unitarios
 ├── tests/
 │   └── e2e/              # Tests end-to-end
 ├── dist/                 # Build de producción
-├── public/               # Assets estáticos
-└── docs/                 # Documentación
+└── public/               # Assets estáticos
 ```
 
 ### Tecnologías Utilizadas
@@ -127,14 +119,9 @@ Cada puzzle incluye un **mensaje secreto** que se revela al completar todas las 
 
 ### Modo Debug
 
-El juego incluye funciones de debug para desarrollo:
-
 ```javascript
 // Activar modo debug
 window.debug.enable();
-
-// Desactivar modo debug
-window.debug.disable();
 
 // Forzar fecha específica (formato: dd/mm/yyyy)
 window.debug.setDate('15/12/2024');
@@ -177,9 +164,6 @@ El juego utiliza un sistema de colores dinámico para las palabras encontradas:
 .found-permanent-3 { background-color: #fbbf24; } /* Amarillo */
 .found-permanent-4 { background-color: #a78bfa; } /* Púrpura */
 .found-permanent-5 { background-color: #34d399; } /* Verde */
-.found-permanent-6 { background-color: #fb7185; } /* Rosa */
-.found-permanent-7 { background-color: #22d3ee; } /* Cian */
-.found-permanent-8 { background-color: #f472b6; } /* Magenta */
 ```
 
 ### Responsive Design
@@ -203,25 +187,6 @@ El proyecto está configurado para deployment automático en GitHub Pages:
    - Push a `main` branch
    - GitHub Actions construye y despliega automáticamente
    - Disponible en: https://palabrix.anieto2k.com
-
-### Configuración de Vite
-
-```javascript
-// vite.config.js
-export default defineConfig({
-  root: 'src',
-  base: '',
-  build: {
-    outDir: '../dist',
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'src/index.html')
-      }
-    }
-  }
-});
-```
 
 ## 🤝 Contribuir
 
