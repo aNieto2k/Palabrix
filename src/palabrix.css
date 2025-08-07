@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+/* palabrix.css - Estilos principales para la sopa de letras */
+
+:root {
+    --grid-cell-size: clamp(20px, 8vw, 45px);
+    --grid-font-size: clamp(14px, 4vw, 22px);
+}
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+#grid-container {
+    touch-action: none;
+}
+.font-mono {
+    font-family: 'Roboto Mono', monospace;
+}
+.grid-cell {
+    width: var(--grid-cell-size);
+    height: var(--grid-cell-size);
+    font-size: var(--grid-font-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+.selecting {
+    background-color: #fde047;
+    color: #1f2937;
+}
+.first-pick {
+    background-color: #fca5a5;
+    color: #1f2937;
+    border-radius: 50%;
+    border-color: #ef4444;
+}
+.found {
+    background-color: #4ade80;
+    color: #1f2937;
+    border-radius: 4px;
+}
+.found-permanent-1 { background-color: #60a5fa; }
+.found-permanent-2 { background-color: #f87171; }
+.found-permanent-3 { background-color: #fbbf24; }
+.found-permanent-4 { background-color: #a78bfa; }
+.found-permanent-5 { background-color: #34d399; }
+.found-permanent-6 { background-color: #fb7185; }
+.found-permanent-7 { background-color: #22d3ee; }
+.found-permanent-8 { background-color: #f472b6; }
+.word-found {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+.secret-letter {
+    background-color: #fde047 !important;
+    color: #1e293b !important;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+.share-icon {
+    max-width: 32px;
+    max-height: 32px;
+    width: 100%;
+    height: auto;
+}
+
+/* Confeti animado para game over */
+.confetti-piece {
+  position: fixed;
+  top: -2vh;
+  width: 10px;
+  height: 18px;
+  border-radius: 3px;
+  opacity: 0.85;
+  z-index: 9999;
+  pointer-events: none;
+  animation: confetti-fall 2.7s cubic-bezier(.62,.01,.47,1.01) forwards;
+}
+@keyframes confetti-fall {
+  to {
+    top: 100vh;
+    transform: translateY(0) rotate(360deg) scale(0.7);
+    opacity: 0.2;
+  }
+}
