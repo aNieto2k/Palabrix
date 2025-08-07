@@ -1,5 +1,6 @@
 import { puzzles } from './puzzle.js';
 import { launchConfetti } from './confetti.js';
+import { launchTripleCompletionEffect } from './triple-completion-effect.js';
 
 // --- DEBUGGING ---
 window.debug = {
@@ -36,6 +37,10 @@ window.debug = {
         localStorage.removeItem('DEBUG_WORDSEARCH_DATE');
         console.log('[WordSearch DEBUG] Fecha forzada eliminada.');
         location.reload();
+    },
+    launchTripleEffect() {
+        console.log('[WordSearch DEBUG] Ejecutando efecto de triple completación...');
+        launchTripleCompletionEffect();
     }
 };
 (function() {
@@ -73,8 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetProgressBtn: document.getElementById('reset-progress-btn'),
         resetProgressBtnMobile: document.getElementById('reset-progress-btn-mobile'),
         copyFeedback: document.getElementById('copy-feedback'),
-        shareTwitter: document.getElementById('share-twitter'),
-        shareCopy: document.getElementById('share-copy'),
     };
 
     // --- GAME CONFIG ---
@@ -237,15 +240,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             gridSizes.forEach(size => {
                 const sizeStats = statsBySize[size];
+                const color = sizeStats.completed > 0 ? 'bg-emerald-700' : 'bg-slate-700';
                 const sizeSection = document.createElement('div');
-                sizeSection.className = 'mb-4 p-3 bg-slate-700 rounded-lg';
+                sizeSection.className = `mb-4 p-3 ${color} rounded-lg` ;
                 
                 const sizeTitle = document.createElement('h4');
                 sizeTitle.className = 'text-lg font-bold text-amber-300 mb-2';
                 sizeTitle.textContent = `Tamaño (${size}x${size})`;
                 
                 const statsList = document.createElement('div');
-                statsList.className = 'space-y-1 text-sm';
+                statsList.className = 'space-y-1 text-sm mb-3';
                 
                 // Partidas completadas
                 const completedItem = document.createElement('div');
@@ -266,10 +270,112 @@ document.addEventListener('DOMContentLoaded', () => {
                 statsList.appendChild(bestTimeItem);
                 statsList.appendChild(totalTimeItem);
                 
+                // Botones de compartir para este tamaño
+                const shareButtons = document.createElement('div');
+                shareButtons.className = 'flex justify-center items-center gap-2 mt-2';
+                
+                // Botón compartir en X
+                const shareXBtn = document.createElement('button');
+                shareXBtn.className = 'p-2 bg-slate-600 hover:bg-slate-500 rounded-full transition';
+                shareXBtn.innerHTML = `
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path fill="white" d="M 2.3671875 3 L 9.4628906 13.140625 L 2.7402344 21 L 5.3808594 21 L 10.644531 14.830078 L 14.960938 21 L 21.871094 21 L 14.449219 10.375 L 20.740234 3 L 18.140625 3 L 13.271484 8.6875 L 9.2988281 3 L 2.3671875 3 z M 6.2070312 5 L 8.2558594 5 L 18.033203 19 L 16.001953 19 L 6.2070312 5 z"></path>
+                    </svg>
+                `;
+                shareXBtn.addEventListener('click', () => {
+                    const text = getShareTextForSize(size, sizeStats);
+                    const encodedText = encodeURIComponent(text);
+                    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+                });
+                
+                // Botón copiar enlace
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'p-2 bg-slate-600 hover:bg-slate-500 rounded-full transition';
+                copyBtn.innerHTML = `
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path fill="white" stroke="white" d="M48.186 92.137c0-8.392 6.49-14.89 16.264-14.89s29.827-.225 29.827-.225-.306-6.99-.306-15.88c0-8.888 7.954-14.96 17.49-14.96 9.538 0 56.786.401 61.422.401 4.636 0 8.397 1.719 13.594 5.67 5.196 3.953 13.052 10.56 16.942 14.962 3.89 4.402 5.532 6.972 5.532 10.604 0 3.633 0 76.856-.06 85.34-.059 8.485-7.877 14.757-17.134 14.881-9.257.124-29.135.124-29.135.124s.466 6.275.466 15.15-8.106 15.811-17.317 16.056c-9.21.245-71.944-.49-80.884-.245-8.94.245-16.975-6.794-16.975-15.422s.274-93.175.274-101.566zm16.734 3.946-1.152 92.853a3.96 3.96 0 0 0 3.958 4.012l73.913.22a3.865 3.865 0 0 0 3.91-3.978l-.218-8.892a1.988 1.988 0 0 0-2.046-1.953s-21.866.64-31.767.293c-9.902-.348-16.672-6.807-16.675-15.516-.003-8.709.003-69.142.003-69.142a1.989 1.989 0 0 0-2.007-1.993l-23.871.082a4.077 4.077 0 0 0-4.048 4.014zm106.508-35.258c-1.666-1.45-3.016-.84-3.016 1.372v17.255c0 1.106.894 2.007 1.997 2.013l20.868.101c2.204.011 2.641-1.156.976-2.606l-20.825-18.135zm-57.606.847a2.002 2.002 0 0 0-2.02 1.988l-.626 96.291a2.968 2.968 0 0 0 2.978 2.997l75.2-.186a2.054 2.054 0 0 0 2.044-2.012l1.268-62.421a1.951 1.951 0 0 0-1.96-2.004s-26.172.042-30.783.042c-4.611 0-7.535-2.222-7.535-6.482S152.3 63.92 152.3 63.92a2.033 2.033 0 0 0-2.015-2.018l-36.464-.23z"></path>
+                    </svg>
+                `;
+                copyBtn.addEventListener('click', () => {
+                    const text = getShareTextForSize(size, sizeStats);
+                    navigator.clipboard.writeText(text).then(() => {
+                        showCopyFeedback(copyBtn);
+                    }).catch(() => {
+                        // Fallback para navegadores antiguos
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        showCopyFeedback(copyBtn);
+                    });
+                });
+                
+                shareButtons.appendChild(shareXBtn);
+                shareButtons.appendChild(copyBtn);
+                
                 sizeSection.appendChild(sizeTitle);
                 sizeSection.appendChild(statsList);
+                sizeSection.appendChild(shareButtons);
                 statsContainer.appendChild(sizeSection);
             });
+            
+            // Botones de compartir generales al final
+            const generalShareSection = document.createElement('div');
+            generalShareSection.className = 'mt-6 p-3 bg-slate-600 rounded-lg';
+            
+            const generalTitle = document.createElement('h4');
+            generalTitle.className = 'text-lg font-bold text-amber-300 mb-3 text-center';
+            generalTitle.textContent = 'Compartir todas las estadísticas';
+            
+            const generalShareButtons = document.createElement('div');
+            generalShareButtons.className = 'flex justify-center items-center gap-4';
+            
+            // Botón compartir en X general
+            const generalShareXBtn = document.createElement('button');
+            generalShareXBtn.className = 'p-3 bg-slate-700 hover:bg-slate-600 rounded-full transition';
+            generalShareXBtn.innerHTML = `
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="white" d="M 2.3671875 3 L 9.4628906 13.140625 L 2.7402344 21 L 5.3808594 21 L 10.644531 14.830078 L 14.960938 21 L 21.871094 21 L 14.449219 10.375 L 20.740234 3 L 18.140625 3 L 13.271484 8.6875 L 9.2988281 3 L 2.3671875 3 z M 6.2070312 5 L 8.2558594 5 L 18.033203 19 L 16.001953 19 L 6.2070312 5 z"></path>
+                </svg>
+            `;
+            generalShareXBtn.addEventListener('click', () => {
+                const text = getShareTextForAllSizes(statsBySize);
+                const encodedText = encodeURIComponent(text);
+                window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+            });
+            
+            // Botón copiar enlace general
+            const generalCopyBtn = document.createElement('button');
+            generalCopyBtn.className = 'p-3 bg-slate-700 hover:bg-slate-600 rounded-full transition';
+            generalCopyBtn.innerHTML = `
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path fill="white" stroke="white" d="M48.186 92.137c0-8.392 6.49-14.89 16.264-14.89s29.827-.225 29.827-.225-.306-6.99-.306-15.88c0-8.888 7.954-14.96 17.49-14.96 9.538 0 56.786.401 61.422.401 4.636 0 8.397 1.719 13.594 5.67 5.196 3.953 13.052 10.56 16.942 14.962 3.89 4.402 5.532 6.972 5.532 10.604 0 3.633 0 76.856-.06 85.34-.059 8.485-7.877 14.757-17.134 14.881-9.257.124-29.135.124-29.135.124s.466 6.275.466 15.15-8.106 15.811-17.317 16.056c-9.21.245-71.944-.49-80.884-.245-8.94.245-16.975-6.794-16.975-15.422s.274-93.175.274-101.566zm16.734 3.946-1.152 92.853a3.96 3.96 0 0 0 3.958 4.012l73.913.22a3.865 3.865 0 0 0 3.91-3.978l-.218-8.892a1.988 1.988 0 0 0-2.046-1.953s-21.866.64-31.767.293c-9.902-.348-16.672-6.807-16.675-15.516-.003-8.709.003-69.142.003-69.142a1.989 1.989 0 0 0-2.007-1.993l-23.871.082a4.077 4.077 0 0 0-4.048 4.014zm106.508-35.258c-1.666-1.45-3.016-.84-3.016 1.372v17.255c0 1.106.894 2.007 1.997 2.013l20.868.101c2.204.011 2.641-1.156.976-2.606l-20.825-18.135zm-57.606.847a2.002 2.002 0 0 0-2.02 1.988l-.626 96.291a2.968 2.968 0 0 0 2.978 2.997l75.2-.186a2.054 2.054 0 0 0 2.044-2.012l1.268-62.421a1.951 1.951 0 0 0-1.96-2.004s-26.172.042-30.783.042c-4.611 0-7.535-2.222-7.535-6.482S152.3 63.92 152.3 63.92a2.033 2.033 0 0 0-2.015-2.018l-36.464-.23z"></path>
+                </svg>
+            `;
+            generalCopyBtn.addEventListener('click', () => {
+                const text = getShareTextForAllSizes(statsBySize);
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyFeedback(generalCopyBtn);
+                }).catch(() => {
+                    // Fallback para navegadores antiguos
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showCopyFeedback(generalCopyBtn);
+                });
+            });
+            
+            generalShareButtons.appendChild(generalShareXBtn);
+            generalShareButtons.appendChild(generalCopyBtn);
+            
+            generalShareSection.appendChild(generalTitle);
+            generalShareSection.appendChild(generalShareButtons);
+            statsContainer.appendChild(generalShareSection);
         }
     }
 
@@ -709,6 +815,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         saveStats();
         
+        // Verificar si se han completado los 3 tamaños
+        checkTripleCompletion();
+        
         elements.messageArea.textContent = '¡Has encontrado todas las palabras!';
         setTimeout(revealSecretMessage, 1000);
     }
@@ -812,27 +921,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return `¡He resuelto la Sopa de Letras Diaria! 🎉\nTema: ${currentPuzzle.theme}\nTamaño: ${gridSize}x${gridSize}\nMi tiempo: ${formatTime(finalTime)}\n¡Inténtalo tú también en https://palabrix.anieto2k.com!`;
     }
 
-    elements.shareTwitter.addEventListener('click', () => {
-        const text = encodeURIComponent(getShareText());
-        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-    });
+    function getShareTextForSize(size, sizeStats) {
+        return `¡He resuelto la Sopa de Letras Diaria! 🎉\nTema: ${currentPuzzle.theme}\nTamaño: ${size}x${size}\nPartidas completadas: ${sizeStats.completed}\nMejor tiempo: ${formatTime(sizeStats.bestTime)}\nTiempo acumulado: ${formatTime(sizeStats.totalTime)}\n¡Inténtalo tú también en https://palabrix.anieto2k.com! #palabrix`;
+    }
 
-    elements.shareCopy.addEventListener('click', () => {
-        const textToCopy = getShareText();
-        const textArea = document.createElement('textarea');
-        textArea.value = textToCopy;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            elements.copyFeedback.textContent = '¡Copiado!';
-            setTimeout(() => { elements.copyFeedback.textContent = ''; }, 2000);
-        } catch (err) {
-            console.error('Error al copiar texto: ', err);
-            elements.copyFeedback.textContent = 'Error al copiar';
-        }
-        document.body.removeChild(textArea);
-    });
+    function getShareTextForAllSizes(statsBySize) {
+        let text = `¡He resuelto la Sopa de Letras Diaria! 🎉\nTema: ${currentPuzzle.theme}\n\nMis estadísticas:\n `;
+        
+        Object.entries(statsBySize).forEach(([size, stats]) => {
+            if (stats.completed > 0) {
+                text += `• ${size}x${size}: ${stats.completed} partidas, mejor tiempo ${formatTime(stats.bestTime)}\n`;
+            }
+        });
+        
+        text += `\n¡Inténtalo tú también en https://palabrix.anieto2k.com! #palabrix`;
+        return text;
+    }
+
+    function showCopyFeedback(button) {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<span class="text-green-400 text-xs">¡Copiado!</span>';
+        setTimeout(() => { 
+            button.innerHTML = originalHTML; 
+        }, 2000);
+    }
 
 
     // --- START ---
@@ -865,10 +977,10 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.gridContainer.innerHTML = `<div class="text-slate-400 text-center p-8" style="grid-column: 1 / -1;">¡Ya has completado el puzle de hoy para este tamaño!</div>`;
         startNextPuzzleCountdown();
         renderStats();
-        elements.modalTitle.textContent = "Puzle del día completado";
+        elements.modalTitle.textContent = `Puzle (${gridSize}x${gridSize}) del día completado`;
         const bestTimeKey = `${puzzleDayIdentifier}-${gridSize}`;
         finalTime = stats.bestTimes[bestTimeKey]; // Set finalTime for sharing
-        elements.modalText.textContent = `Tu mejor tiempo hoy: ${formatTime(finalTime)}. El mensaje secreto es:`;
+        elements.modalText.innerHTML = `Tu tiempo para ${gridSize}x${gridSize} ha sido de <strong>${formatTime(finalTime)}.</strong>`;
         elements.secretMessage.textContent = currentPuzzle.secret;
         elements.modal.classList.remove('hidden');
     }
@@ -906,6 +1018,26 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.messageArea.textContent = 'Próximo puzle en:';
         updateCountdown();
         countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function checkTripleCompletion() {
+        const gridSizes = [16, 20, 24];
+        let completedSizes = 0;
+        
+        gridSizes.forEach(size => {
+            const completedKey = `${puzzleDayIdentifier}-${size}`;
+            if (stats.completedBySize && stats.completedBySize[completedKey] && stats.completedBySize[completedKey] > 0) {
+                completedSizes++;
+            }
+        });
+        
+        // Si se han completado los 3 tamaños, ejecutar el efecto especial
+        if (completedSizes === 3) {
+            console.log('¡TRIPLE CORONA! Se han completado los 3 tamaños en un día.');
+            setTimeout(() => {
+                launchTripleCompletionEffect();
+            }, 2000); // Esperar 2 segundos después del confeti normal
+        }
     }
 
     initializeGame();
