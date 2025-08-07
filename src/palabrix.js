@@ -1,6 +1,8 @@
 import { puzzles } from './puzzle.js';
 import { launchConfetti } from './confetti.js';
 import { launchTripleCompletionEffect } from './triple-completion-effect.js';
+import { launchWordCompletionEffect } from './word-completion-effect.js';
+import { launchPanelCompletionEffect } from './panel-completion-effect.js';
 
 // --- DEBUGGING ---
 window.debug = {
@@ -41,6 +43,22 @@ window.debug = {
     launchTripleEffect() {
         console.log('[WordSearch DEBUG] Ejecutando efecto de triple completación...');
         launchTripleCompletionEffect();
+    },
+    launchWordEffect() {
+        console.log('[WordSearch DEBUG] Ejecutando efecto de palabra completada...');
+        // Crear coordenadas de ejemplo para el efecto
+        const mockCoords = [
+            { el: document.querySelector('.grid-cell') || document.createElement('div') }
+        ];
+        if (mockCoords[0].el) {
+            launchWordCompletionEffect('EJEMPLO', mockCoords);
+        } else {
+            console.log('[WordSearch DEBUG] No se encontraron celdas para el efecto de ejemplo');
+        }
+    },
+    launchPanelEffect() {
+        console.log('[WordSearch DEBUG] Ejecutando efecto de completación de panel...');
+        launchPanelCompletionEffect();
     }
 };
 (function() {
@@ -765,6 +783,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 stats.gameState[gameStateKey].foundWordsData.push({ word, coords: coordsToSave });
                 saveStats();
 
+                // Lanzar efecto de palabra completada
+                launchWordCompletionEffect(word, selectionCoords);
+
                 break; 
             }
         }
@@ -784,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timerInterval) clearInterval(timerInterval);
         finalTime = Math.floor((Date.now() - startTime) / 1000);
         // Lanzar confeti al ganar
-        launchConfetti();
+        launchPanelCompletionEffect();
         stats.gamesCompleted++;
         stats.totalCompletionTime += finalTime;
         const bestTimeKey = `${puzzleDayIdentifier}-${gridSize}`;
