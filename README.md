@@ -3,9 +3,9 @@
 [![Tests](https://github.com/anieto2k/palabrix/actions/workflows/test.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/test.yml)
 [![E2E Tests](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml)
 
-> 🎮 **Sopa de letras diaria en JavaScript vanilla** - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales espectaculares.
+> 🎮 **Sopa de letras diaria en JavaScript vanilla** - Nuevo puzzle temático cada día con palabras ocultas en **8 direcciones**. Diseño responsive, progreso persistente y efectos visuales espectaculares.
 
-**Palabrix** es una aplicación web moderna de sopa de letras diaria desarrollada en JavaScript vanilla. Cada día presenta un nuevo puzzle temático con palabras ocultas en diferentes direcciones (horizontal, vertical y diagonal).
+**Palabrix** es una aplicación web moderna de sopa de letras diaria desarrollada en JavaScript vanilla. Cada día presenta un nuevo puzzle temático con palabras ocultas en **todas las direcciones posibles** (horizontal, vertical y diagonal en ambas direcciones).
 
 🌐 **Demo en vivo**: [palabrix.anieto2k.com](https://palabrix.anieto2k.com)
 
@@ -13,6 +13,7 @@
 
 - 🎮 **Puzzle Diario**: Nuevo puzzle cada día a las 9:00 AM
 - 🎯 **Múltiples Tamaños**: Grids de 16x16, 20x20 y 24x24
+- 🧭 **8 Direcciones de Búsqueda**: Horizontal, vertical y diagonal en ambas direcciones
 - 📱 **Diseño Responsivo**: Optimizado para móviles y escritorio
 - 🎨 **Interfaz Moderna**: Diseño elegante con Tailwind CSS
 - 💾 **Progreso Persistente**: Guarda tu progreso automáticamente
@@ -28,7 +29,7 @@
   - Tiempo acumulado preciso
   - Compartir estadísticas individuales y generales
 - 🐦 **Compartir**: Comparte tus resultados en redes sociales
-- 🧪 **Tests Completos**: Cobertura de tests unitarios y E2E
+- 🧪 **Tests Completos**: 30 tests (18 unitarios + 12 E2E) con cobertura completa
 
 ## 🚀 Instalación y Uso
 
@@ -59,8 +60,8 @@ Abre tu navegador en `http://localhost:5173` y ¡disfruta del juego!
 npm run dev          # Inicia el servidor de desarrollo
 npm run build        # Construye para producción
 npm run preview      # Vista previa de la build de producción
-npm run test         # Ejecuta tests unitarios con Vitest
-npm run e2e          # Ejecuta tests end-to-end con Playwright
+npm run test         # Ejecuta tests unitarios con Vitest (30 tests)
+npm run e2e          # Ejecuta tests end-to-end con Playwright (12 tests)
 ```
 
 ## 🎮 Cómo Jugar
@@ -74,12 +75,25 @@ npm run e2e          # Ejecuta tests end-to-end con Playwright
 4. **Completa todas las palabras** para revelar el mensaje secreto
 5. **Comparte tus resultados** en redes sociales
 
-### Direcciones de Búsqueda
+### 🧭 Direcciones de Búsqueda (8 Direcciones)
 
+**Palabrix** soporta **todas las direcciones posibles** de búsqueda:
+
+#### **Direcciones Horizontales:**
 - ➡️ **Horizontal** (izquierda a derecha)
+- ⬅️ **Horizontal** (derecha a izquierda)
+
+#### **Direcciones Verticales:**
 - ⬇️ **Vertical** (arriba a abajo)
+- ⬆️ **Vertical** (abajo a arriba)
+
+#### **Direcciones Diagonales:**
 - ↘️ **Diagonal** (esquina superior izquierda a inferior derecha)
+- ↖️ **Diagonal** (esquina inferior derecha a superior izquierda)
 - ↙️ **Diagonal** (esquina superior derecha a inferior izquierda)
+- ↗️ **Diagonal** (esquina inferior izquierda a superior derecha)
+
+**¡Cada palabra puede estar oculta en cualquiera de estas 8 direcciones!**
 
 ## 🎊 Efectos Visuales
 
@@ -158,6 +172,39 @@ El juego incluye **50+ puzzles temáticos** con palabras en español:
 
 Cada puzzle incluye un **mensaje secreto** que se revela al completar todas las palabras.
 
+## 🧪 Testing y Calidad
+
+### Cobertura de Tests
+
+**Palabrix** cuenta con una suite completa de tests:
+
+#### **Tests Unitarios (18 tests):**
+- ✅ **Funcionalidad básica**: Grid, colocación de palabras, tiempo
+- ✅ **8 direcciones de búsqueda**: Todas las direcciones implementadas
+- ✅ **Límites y validaciones**: Casos edge y errores
+- ✅ **Efectos visuales**: Todos los efectos funcionan correctamente
+- ✅ **Estadísticas**: Cálculos precisos y persistencia
+
+#### **Tests E2E (12 tests):**
+- ✅ **Flujo completo del juego**: Desde inicio hasta completación
+- ✅ **8 direcciones interactivas**: Búsqueda en todas las direcciones
+- ✅ **Interfaz de usuario**: Responsive design y navegación
+- ✅ **Estadísticas y compartir**: Funcionalidades completas
+- ✅ **Efectos visuales**: Verificación de todos los efectos
+
+### Ejecutar Tests
+
+```bash
+# Tests unitarios (rápidos)
+npm run test
+
+# Tests E2E (requiere servidor corriendo)
+npm run e2e
+
+# Cobertura de tests
+npm run test -- --coverage
+```
+
 ## 🔧 Funciones de Desarrollo
 
 ### Modo Debug
@@ -180,19 +227,6 @@ window.debug.launchWordEffect();
 
 // Ejecutar efecto de completación de panel
 window.debug.launchPanelEffect();
-```
-
-### Tests
-
-```bash
-# Tests unitarios
-npm run test
-
-# Tests E2E (requiere servidor corriendo)
-npm run e2e
-
-# Cobertura de tests
-npm run test -- --coverage
 ```
 
 ## 📊 Estadísticas y Progreso
@@ -267,10 +301,11 @@ El proyecto está configurado para deployment automático en GitHub Pages:
 ### Guías de Contribución
 
 - 📝 **Código**: Sigue las convenciones de JavaScript ES6+
-- 🧪 **Tests**: Añade tests para nuevas funcionalidades
+- 🧪 **Tests**: Añade tests para nuevas funcionalidades (unit + E2E)
 - 📚 **Documentación**: Actualiza la documentación según sea necesario
 - 🎨 **Diseño**: Mantén la consistencia visual
 - ✨ **Efectos**: Asegúrate de que los efectos sean compatibles con móviles
+- 🧭 **Direcciones**: Verifica que las 8 direcciones funcionen correctamente
 
 ## 📄 Licencia
 

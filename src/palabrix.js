@@ -558,7 +558,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function placeWord(word) {
         debugLog('Intentando colocar palabra', word);
-        const directions = [{ r: 0, c: 1 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: -1 }];
+        const directions = [
+            { r: 0, c: 1 },   // ➡️ Horizontal (izquierda a derecha)
+            { r: 0, c: -1 },  // ⬅️ Horizontal (derecha a izquierda)
+            { r: 1, c: 0 },   // ⬇️ Vertical (arriba a abajo)
+            { r: -1, c: 0 },  // ⬆️ Vertical (abajo a arriba)
+            { r: 1, c: 1 },   // ↘️ Diagonal (esquina superior izquierda a inferior derecha)
+            { r: -1, c: -1 }, // ↖️ Diagonal (esquina inferior derecha a superior izquierda)
+            { r: 1, c: -1 },  // ↙️ Diagonal (esquina superior derecha a inferior izquierda)
+            { r: -1, c: 1 }   // ↗️ Diagonal (esquina inferior izquierda a superior derecha)
+        ];
         const wordToPlace = srandom() > 0.5 ? word : word.split('').reverse().join('');
         let placed = false, attempts = 0;
         while (!placed && attempts < 100) {
@@ -1091,7 +1100,16 @@ export function canPlaceWord(grid, word, r, c, dir, gridSize) {
 }
 
 export function placeWord(grid, word, gridSize, rng = Math.random) {
-  const directions = [{ r: 0, c: 1 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: -1 }];
+  const directions = [
+    { r: 0, c: 1 },   // ➡️ Horizontal (izquierda a derecha)
+    { r: 0, c: -1 },  // ⬅️ Horizontal (derecha a izquierda)
+    { r: 1, c: 0 },   // ⬇️ Vertical (arriba a abajo)
+    { r: -1, c: 0 },  // ⬆️ Vertical (abajo a arriba)
+    { r: 1, c: 1 },   // ↘️ Diagonal (esquina superior izquierda a inferior derecha)
+    { r: -1, c: -1 }, // ↖️ Diagonal (esquina inferior derecha a superior izquierda)
+    { r: 1, c: -1 },  // ↙️ Diagonal (esquina superior derecha a inferior izquierda)
+    { r: -1, c: 1 }   // ↗️ Diagonal (esquina inferior izquierda a superior derecha)
+  ];
   let placed = false, attempts = 0;
   while (!placed && attempts < 100) {
     const dir = directions[Math.floor(rng() * directions.length)];
