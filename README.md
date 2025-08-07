@@ -3,7 +3,7 @@
 [![Tests](https://github.com/anieto2k/palabrix/actions/workflows/test.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/test.yml)
 [![E2E Tests](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml/badge.svg)](https://github.com/anieto2k/palabrix/actions/workflows/e2e.yml)
 
-> 🎮 **Sopa de letras diaria en JavaScript vanilla** - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales.
+> 🎮 **Sopa de letras diaria en JavaScript vanilla** - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales espectaculares.
 
 **Palabrix** es una aplicación web moderna de sopa de letras diaria desarrollada en JavaScript vanilla. Cada día presenta un nuevo puzzle temático con palabras ocultas en diferentes direcciones (horizontal, vertical y diagonal).
 
@@ -17,9 +17,16 @@
 - 🎨 **Interfaz Moderna**: Diseño elegante con Tailwind CSS
 - 💾 **Progreso Persistente**: Guarda tu progreso automáticamente
 - ⏱️ **Sistema de Tiempo**: Cronómetro integrado con mejores tiempos
-- 🎊 **Efectos Visuales**: Confeti animado al completar el puzzle
+- 🎊 **Efectos Visuales Espectaculares**: 
+  - ✨ Efectos de palabras completadas (partículas, sparkles, texto flotante)
+  - 🏆 Efecto "Triple Corona" al completar los 3 tamaños
+  - 🎆 Efecto épico de completación de panel
 - 🔍 **Mensaje Secreto**: Descubre el mensaje oculto al final
-- 📊 **Estadísticas**: Seguimiento de partidas jugadas y completadas
+- 📊 **Estadísticas Avanzadas**: 
+  - Estadísticas separadas por tamaño de grid
+  - Mejores tiempos por día y tamaño
+  - Tiempo acumulado preciso
+  - Compartir estadísticas individuales y generales
 - 🐦 **Compartir**: Comparte tus resultados en redes sociales
 - 🧪 **Tests Completos**: Cobertura de tests unitarios y E2E
 
@@ -63,7 +70,7 @@ npm run e2e          # Ejecuta tests end-to-end con Playwright
 3. **Busca las palabras** en la lista:
    - Haz clic en la primera letra de la palabra
    - Haz clic en la última letra de la palabra
-   - Las palabras se marcarán automáticamente
+   - Las palabras se marcarán automáticamente con efectos visuales
 4. **Completa todas las palabras** para revelar el mensaje secreto
 5. **Comparte tus resultados** en redes sociales
 
@@ -74,6 +81,39 @@ npm run e2e          # Ejecuta tests end-to-end con Playwright
 - ↘️ **Diagonal** (esquina superior izquierda a inferior derecha)
 - ↙️ **Diagonal** (esquina superior derecha a inferior izquierda)
 
+## 🎊 Efectos Visuales
+
+### ✨ Efectos de Palabras Completadas
+Cuando encuentras una palabra correcta, se activan múltiples efectos:
+- **Partículas explosivas**: 15 partículas coloridas por celda
+- **Texto flotante**: "¡PALABRA!" que aparece y flota
+- **Pulso en celdas**: Las celdas pulsan con sombra dorada
+- **Sparkles mágicos**: 8 sparkles brillantes por celda
+
+### 🏆 Efecto "Triple Corona"
+Al completar los 3 tamaños en un día, se activa un efecto especial:
+- **Overlay espectacular**: Gradiente animado con colores vibrantes
+- **Texto épico**: "¡TRIPLE CORONA!" con efectos de pulso y brillo
+- **Trofeo gigante**: 🏆 que rebota con animación
+- **Estrellas rotatorias**: 12 estrellas que rotan por toda la pantalla
+- **Fuegos artificiales**: 20 explosiones de colores
+- **Partículas de celebración**: 50 partículas que explotan
+- **Ondas de choque**: 3 ondas que se expanden
+- **Sonido triunfal**: Melodía de celebración
+
+### 🎆 Efecto de Completación de Panel
+Al completar un puzzle, se activa un efecto épico:
+- **Overlay con gradiente**: Fondo púrpura-azul animado
+- **Texto principal**: "¡PUZZLE COMPLETADO!" con pulso y brillo
+- **Trofeo rebotante**: 🏆 gigante que rebota
+- **Subtítulo flotante**: "¡Excelente trabajo!"
+- **Estrellas rotatorias**: 12 estrellas que rotan
+- **Sparkles mágicos**: 30 partículas brillantes
+- **Fuegos artificiales**: 20 explosiones de colores
+- **Partículas de celebración**: 50 partículas que explotan
+- **Ondas de choque**: 3 ondas que se expanden
+- **Sonido de celebración**: Melodía triunfal
+
 ## 🏗️ Arquitectura del Proyecto
 
 ```
@@ -83,7 +123,10 @@ palabrix/
 │   ├── main.js           # Punto de entrada
 │   ├── palabrix.js       # Lógica principal del juego
 │   ├── puzzle.js         # Datos de puzzles (50+ temas)
-│   ├── confetti.js       # Efectos de confeti
+│   ├── confetti.js       # Efectos de confeti (legacy)
+│   ├── word-completion-effect.js    # Efectos de palabras completadas
+│   ├── triple-completion-effect.js  # Efecto triple corona
+│   ├── panel-completion-effect.js   # Efecto de completación de panel
 │   ├── palabrix.css      # Estilos principales
 │   └── *.spec.js         # Tests unitarios
 ├── tests/
@@ -128,6 +171,15 @@ window.debug.setDate('15/12/2024');
 
 // Limpiar fecha forzada
 window.debug.clearDate();
+
+// Ejecutar efecto de triple corona
+window.debug.launchTripleEffect();
+
+// Ejecutar efecto de palabra completada
+window.debug.launchWordEffect();
+
+// Ejecutar efecto de completación de panel
+window.debug.launchPanelEffect();
 ```
 
 ### Tests
@@ -151,6 +203,20 @@ El juego guarda automáticamente:
 - ⏱️ **Mejores tiempos**: Por puzzle y tamaño de grid
 - 📈 **Estadísticas generales**: Partidas jugadas y completadas
 - 🎯 **Estado del juego**: Posición actual y tiempo transcurrido
+- 📊 **Estadísticas por tamaño**: 
+  - Partidas completadas por tamaño (16x16, 20x20, 24x24)
+  - Mejor tiempo por día y tamaño
+  - Tiempo acumulado preciso por tamaño
+- 🏆 **Logros especiales**: Triple corona al completar los 3 tamaños
+
+### Estadísticas Detalladas
+
+Las estadísticas se muestran separadas por tamaño de grid:
+- **Tamaño (16x16)**: Partidas completadas, mejor tiempo, tiempo acumulado
+- **Tamaño (20x20)**: Partidas completadas, mejor tiempo, tiempo acumulado  
+- **Tamaño (24x24)**: Partidas completadas, mejor tiempo, tiempo acumulado
+
+Cada sección incluye botones para compartir en X y copiar enlace.
 
 ## 🎨 Personalización
 
@@ -168,7 +234,7 @@ El juego utiliza un sistema de colores dinámico para las palabras encontradas:
 
 ### Responsive Design
 
-- 📱 **Móvil**: Grid adaptativo con scroll horizontal
+- 📱 **Móvil**: Grid adaptativo con scroll horizontal, modal fullscreen
 - 💻 **Tablet**: Layout optimizado para pantallas medianas
 - 🖥️ **Desktop**: Layout completo con panel lateral
 
@@ -204,6 +270,7 @@ El proyecto está configurado para deployment automático en GitHub Pages:
 - 🧪 **Tests**: Añade tests para nuevas funcionalidades
 - 📚 **Documentación**: Actualiza la documentación según sea necesario
 - 🎨 **Diseño**: Mantén la consistencia visual
+- ✨ **Efectos**: Asegúrate de que los efectos sean compatibles con móviles
 
 ## 📄 Licencia
 

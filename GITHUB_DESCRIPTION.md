@@ -3,7 +3,7 @@
 ## Descripción Corta (para el campo "Description" del repositorio)
 
 ```
-🎮 Sopa de letras diaria en JavaScript vanilla - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales.
+🎮 Sopa de letras diaria en JavaScript vanilla - Nuevo puzzle temático cada día con palabras ocultas en múltiples direcciones. Diseño responsive, progreso persistente y efectos visuales espectaculares.
 ```
 
 ## Descripción Media (para el campo "About" del repositorio)
@@ -15,8 +15,9 @@ Palabrix es una aplicación web moderna de sopa de letras diaria desarrollada en
 • Puzzle diario con 50+ temas
 • Múltiples tamaños de grid (16x16, 20x20, 24x24)
 • Diseño responsive para móvil y desktop
-• Progreso persistente y estadísticas
-• Efectos visuales y confeti
+• Progreso persistente y estadísticas avanzadas
+• Efectos visuales espectaculares (palabras, triple corona, completación)
+• Estadísticas separadas por tamaño con compartir
 • Tests completos (unit + E2E)
 
 🌐 Demo: palabrix.anieto2k.com
@@ -25,7 +26,7 @@ Palabrix es una aplicación web moderna de sopa de letras diaria desarrollada en
 ## Tags Sugeridos
 
 ```
-javascript, vanilla-js, word-search, puzzle-game, daily-puzzle, responsive-design, tailwind-css, vite, vitest, playwright, web-game, spanish, sopa-de-letras
+javascript, vanilla-js, word-search, puzzle-game, daily-puzzle, responsive-design, tailwind-css, vite, vitest, playwright, web-game, spanish, sopa-de-letras, effects, animations
 ```
 
 ## Topics Sugeridos para GitHub
@@ -52,4 +53,7 @@ frontend
 css
 html
 testing
+effects
+animations
+visual-effects
 ```
