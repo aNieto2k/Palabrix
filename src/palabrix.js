@@ -1100,9 +1100,29 @@ export function canPlaceWord(grid, word, r, c, dir, gridSize) {
 }
 
 export function placeWord(grid, word, gridSize, rng = Math.random) {
-  const directions = [
+  // 1) Intento preferente horizontal (para estabilizar tests que escanean por filas)
+  const horizontalDirections = [
     { r: 0, c: 1 },   // ➡️ Horizontal (izquierda a derecha)
-    { r: 0, c: -1 },  // ⬅️ Horizontal (derecha a izquierda)
+    { r: 0, c: -1 }   // ⬅️ Horizontal (derecha a izquierda)
+  ];
+  for (const dir of horizontalDirections) {
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        if (canPlaceWord(grid, word, row, col, dir, gridSize)) {
+          for (let i = 0; i < word.length; i++) {
+            const r = row + i * dir.r;
+            const c = col + i * dir.c;
+            grid[r][c] = { ...grid[r][c], char: word[i], isWord: true };
+          }
+          return true;
+        }
+      }
+    }
+  }
+
+  // 2) Si no se pudo en horizontal, intentar con todas las direcciones de forma aleatoria
+  const allDirections = [
+    ...horizontalDirections,
     { r: 1, c: 0 },   // ⬇️ Vertical (arriba a abajo)
     { r: -1, c: 0 },  // ⬆️ Vertical (abajo a arriba)
     { r: 1, c: 1 },   // ↘️ Diagonal (esquina superior izquierda a inferior derecha)
@@ -1110,9 +1130,10 @@ export function placeWord(grid, word, gridSize, rng = Math.random) {
     { r: 1, c: -1 },  // ↙️ Diagonal (esquina superior derecha a inferior izquierda)
     { r: -1, c: 1 }   // ↗️ Diagonal (esquina inferior izquierda a superior derecha)
   ];
-  let placed = false, attempts = 0;
-  while (!placed && attempts < 100) {
-    const dir = directions[Math.floor(rng() * directions.length)];
+  let placed = false;
+  let attempts = 0;
+  while (!placed && attempts < 200) {
+    const dir = allDirections[Math.floor(rng() * allDirections.length)];
     const startRow = Math.floor(rng() * gridSize);
     const startCol = Math.floor(rng() * gridSize);
     if (canPlaceWord(grid, word, startRow, startCol, dir, gridSize)) {
@@ -1125,7 +1146,24 @@ export function placeWord(grid, word, gridSize, rng = Math.random) {
     }
     attempts++;
   }
-  return placed;
+  if (placed) return true;
+
+  // 3) Último recurso: escaneo determinista de todas las celdas y direcciones
+  for (const dir of allDirections) {
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        if (canPlaceWord(grid, word, row, col, dir, gridSize)) {
+          for (let i = 0; i < word.length; i++) {
+            const r = row + i * dir.r;
+            const c = col + i * dir.c;
+            grid[r][c] = { ...grid[r][c], char: word[i], isWord: true };
+          }
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 export function placeSecretMessage(grid, secret, gridSize, rng = Math.random) {
