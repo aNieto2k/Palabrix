@@ -1,12 +1,17 @@
-const CACHE_NAME = 'palabrix-cache-v1';
+const CACHE_NAME = 'palabrix-cache-v2';
 const ASSETS = [
   '/',
-  '/index.html'
+  '/index.html',
+  '/offline.html',
+  '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => Promise.allSettled(ASSETS.map((url) => cache.add(url))))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -27,7 +32,12 @@ self.addEventListener('fetch', (event) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
         return response;
-      }).catch(() => cached);
+      }).catch(() => {
+        if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {
+          return caches.match('/offline.html');
+        }
+        return cached;
+      });
     })
   );
 });
